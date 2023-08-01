@@ -37,6 +37,7 @@ void generateBoard(int board[SIZE_BOARD][SIZE_BOARD]);
 void showBoard(int board[SIZE_BOARD][SIZE_BOARD]);
 void verifyLevantament(int player);
 void movePiece(int indice, int player);
+void clear();
 void menu();
 void startGame();
 
@@ -232,6 +233,7 @@ void movePiece(int indice, int player){
     board[validatePlay[indice].row][validatePlay[indice].column] = player;
     lastRowMove = validatePlay[indice].row;
     lastColumnMove = validatePlay[indice].column;
+    clear();
     if(player == WHITEPIECES){
         piecesTeamWhite++;
     }
@@ -249,6 +251,7 @@ int main(){
     generateBoard(board);
     board[4][3] = 20;
     board[3][4] = 10;
+    board[3][2] = 10;
     board[2][5] = 0;
     board[0][3] = 0;
     board[2][1] = 0;
@@ -267,6 +270,7 @@ int main(){
                 printf("\nJogada valida\n");
                 printf("\nLinha: %d\nColuna: %d\n", validatePlay[i].row, validatePlay[i].column);
                 movePiece(i, BLACKPIECES);
+                break;
             }
         }
     }while(verifyPiece != piecesTeamBlack);
@@ -305,6 +309,17 @@ void menu(){
     else{
         printf("\nSaindo do jogo!\n");
         exit(0);
+    }
+}
+
+void clear(){
+    for(int i = 0; i < counterAux; i++){
+        validatePlay[i].row = 0;
+        validatePlay[i].column = 0;
+        validatePlay[i].rowOperation = 0;
+        validatePlay[i].columnOperation = 0;
+        validatePlay[i].critical = 0;
+        counterAux = 0;
     }
 }
 

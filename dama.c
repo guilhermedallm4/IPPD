@@ -3,8 +3,6 @@
 #include <omp.h>
 #include <time.h>
 
-#define NEGATIVEINFINITY -1000
-#define POSITIVEINFINITY 1000
 #define SIZE_BOARD 8
 #define WHITEPIECES 10
 #define BLACKPIECES 20
@@ -15,6 +13,8 @@
 int board[SIZE_BOARD][SIZE_BOARD];
 int counter;
 int flag = 0;
+int playerTurn = 0;
+int countTurn = 0;
 
 typedef struct{
     int row;
@@ -42,8 +42,9 @@ void clear();
 int menu();
 void startGame();
 int moveGetPiece(int player);
-int playingMachine(int playerMachine, int validate);
-int playingPlayer(int playerOne, int validate);
+int playingMachine(int playerMachine);
+int playingPlayer(int playerOne);
+int selectPlay(int playerOne);
 
 void levantamentPlaying(int player, int rowOrigin, int columnOrigin){   
     counter = 0;
@@ -294,10 +295,12 @@ void movePieceOneMoviment(){
     int upper_bound = counterAux;
     srand(time(NULL));
     int random_number = lower_bound + (rand() % (upper_bound - lower_bound));
-    int piece = board[lastRowMove][lastColumnMove]; 
+    int piece = board[lastRowMove][lastColumnMove];
     int aux = board[validatePlay[random_number].row][validatePlay[random_number].column];
     board[lastRowMove][lastColumnMove] = aux;
     board[validatePlay[random_number].row][validatePlay[random_number].column] = piece;
+    lastRowMove = validatePlay[random_number].row;
+    lastColumnMove = validatePlay[random_number].column;
 }
 
 void clear(){
@@ -347,22 +350,37 @@ int menu(){
     }
 }
 
-int playingMachine(int playerMachine, int validate){
+int counterPlay = 0;
+
+int playingMachine(int playerMachine){
     flag = 0;
-    validate =  moveGetPiece(playerMachine);
+    lastRowMove = 2+counterPlay;
+    lastColumnMove = 1+counterPlay;
+    counterPlay++;
+    int validate =  moveGetPiece(playerMachine);
+    printf("\n%d\n", validate);
+    printf("\n%d\n", counterAux);
     if(validate == 0 && flag == 0){
         movePieceOneMoviment();
         printf("\n");
         showBoard(board);
         printf("\n");
+        clear();
+        if(validate == 0 && playerMachine == WHITEPIECES){
+            playerTurn = BLACKPIECES;
+        }
+        else{
+            playerTurn = WHITEPIECES;
+        } 
+        return flag + 1;
     }
-    return validate;
+    return flag;
 }
 
-int playingPlayer(int playerOne, int validate){
+int playingPlayer(int playerOne){
     for(int i = 0; i<counterAux;i++){
         printf("\nOpcao: %d", i+1);
-        printf("\nLinha: %d\n Coluna: %d\n", validatePlay[i].row, validatePlay[i].column);
+        printf("\nLinha: %d\nColuna: %d\n", validatePlay[i].row+1, validatePlay[i].column+1);
     }
     if(counterAux != 0){
         int option;
@@ -373,46 +391,112 @@ int playingPlayer(int playerOne, int validate){
         board[lastRowMove][lastColumnMove] = aux;
         board[validatePlay[option-1].row][validatePlay[option-1].column] = piece;
         showBoard(board);
-    }    
+        return 1;
+    }
+    else{
+        if(playerOne == WHITEPIECES){
+            printf("Pecas Pretas ganharam");
+            exit(0);
+        }
+        else{
+            printf("Pecas Brancas ganharam");
+            exit(0);
+        }
+    }   
 }
 
 int main(){
-    Playing *play;
-    int row, column;   
+    Playing *play;   
     int playerOne = menu();
     int playerMachine = 0;
-    if(playerOne == WHITEPIECES) playerMachine = BLACKPIECES;
-    else playerMachine = WHITEPIECES;
+    if(playerOne == WHITEPIECES) {
+        playerMachine = BLACKPIECES;}
+    else {
+        playerMachine = WHITEPIECES;
+    }
+    playerTurn = WHITEPIECES;
     generateBoard(board);
-    //board[4][3] = 20;
-    //board[3][4] = 10;
-    //board[3][2] = 10;
-    //board[2][5] = 0;
-    //board[0][3] = 0;
-    //board[6][1] = 0;
     showBoard(board);
+    //board[3][2] = 20;
     printf("\n");
     printf("\n");
-    printf("\nEscolha a linha que queira jogar: \n");
-    scanf("%d", &row);
-    printf("\nEscolha a coluna que queira jogar: \n");
-    scanf("%d", &column);
-    lastRowMove = row-1;
-    lastColumnMove = column-1;
-    int verifyPiece = 0;
     int validate = 0;
-    levantamentPlaying(playerOne, lastRowMove, lastColumnMove);
-    playingPlayer(playerOne, validate);
-    /*do{
-        validate = playingMachine(playerMachine, validate);
-    }while(validate);
-    //levantamentPlaying(playerOne, 3, 2);
-    printf("\nQuantidade de jogadas disponiveis: %d\n", counterAux);
-    for(int i = 0; i<counterAux;i++){
-        printf("\nLinha: %d\n Coluna: %d\n", validatePlay[i].row, validatePlay[i].column);
-    }   
-    printf("Quantidade de pecas comidas pelo time preto: %d", piecesTeamBlack);*/
+    int verify = 1;
+    while(verify)
+    {
+        if(playerTurn == playerOne){
+            if(playerOne == BLACKPIECES){
+                validate = piecesTeamBlack;
+                verify = selectPlay(playerOne);
+                if(validate == piecesTeamBlack){
+                    playerTurn = BLACKPIECES;
+                }
+                else{
+                    playerTurn = WHITEPIECES;
+                }   
+            }
+            else{
+                validate = piecesTeamWhite;
+                verify = selectPlay(playerOne);
+                if(validate == piecesTeamWhite){
+                    playerTurn = BLACKPIECES;
+                }
+                else{
+                    playerTurn = WHITEPIECES;
+                }
+            }
+            countTurn++;
+        }
+        else{
+            if(playerMachine == BLACKPIECES){
+                verify = playingMachine(playerMachine);
+           
+            }
+            else{
+                verify = playingMachine(playerMachine);
+            }
+            
+        }
+        countTurn++;
+        printf("%d", countTurn);   
+    }
+     
+    
 }
 
+int selectPlay(int playerOne){
+    int row, column, continueGame;
+    do{
+        printf("\nEscolha a linha que queira jogar: \n");
+        scanf("%d", &row);
+        printf("\nEscolha a coluna que queira jogar: \n");
+        scanf("%d", &column);
+        if(board[row-1][column-1] != playerOne){
+            printf("\nPeca invalida\n");
+        }
+    }while(board[row-1][column-1] != playerOne);
+    lastRowMove = row-1;
+    lastColumnMove = column-1;
+    levantamentPlaying(playerOne, lastRowMove, lastColumnMove);
+    continueGame = playingPlayer(playerOne);
+    return continueGame;
+}
 
-
+/*
+int selectPiece(){
+    int row, column, continueGame;
+    do{
+        printf("\nEscolha a linha que queira jogar: \n");
+        scanf("%d", &row);
+        printf("\nEscolha a coluna que queira jogar: \n");
+        scanf("%d", &column);
+        if(board[row-1][column-1] != playerOne){
+            printf("\nPeca invalida\n");
+        }
+    }while(board[row-1][column-1] != playerOne);
+    lastRowMove = row-1;
+    lastColumnMove = column-1;
+    levantamentPlaying(playerOne, lastRowMove, lastColumnMove);
+    continueGame = playingPlayer(playerOne);
+    return continueGame;
+}*/

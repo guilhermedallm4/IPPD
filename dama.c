@@ -18,9 +18,9 @@ int flag = 0;
 typedef struct{
     int row;
     int rowOperation;
-    int colum;
-    int columOperation;
-
+    int column;
+    int columnOperation;
+    int critical;
 } Playing;
 
 Playing play[4];
@@ -32,112 +32,57 @@ int piecesTeamWhite = 0;
 int piecesTeamBlack = 0;
 int counterAux = 0;
 
-void levantamentPlaying(int player, int rowOrigin, int columOrigin);
+void levantamentPlaying(int player, int rowOrigin, int columnOrigin);
 void generateBoard(int board[SIZE_BOARD][SIZE_BOARD]);
 void showBoard(int board[SIZE_BOARD][SIZE_BOARD]);
 void verifyLevantament(int player);
-void verifyPieces(int player, int rowOrigin, int columnOrigin, int i, int operationRow, int operationColumn);
+void movePiece(int indice, int player);
+void menu();
+void startGame();
 
-
-void levantamentPlaying(int player, int rowOrigin, int columOrigin){
+void levantamentPlaying(int player, int rowOrigin, int columnOrigin){
     
     counter = 0;
-    if(player == WHITEPIECES){
-        if(board[rowOrigin][columOrigin] == player){
-            if(rowOrigin+1<= SIZE_BOARD){
-                if((columOrigin - 1) >= 0){
-                    play[counter].row = rowOrigin + 1;
-                    play[counter].colum = columOrigin -1;
-                    play[counter].rowOperation = 1;
-                    play[counter].columOperation = -1;
-                    //printf("1: \n Jogada linha: %d\nJogada Coluna:%d\n", play[counter].row, play[counter].colum);
-                    counter++;
+    if(board[rowOrigin][columnOrigin] == player){
+        if(rowOrigin+1<= SIZE_BOARD){
+            if((columnOrigin - 1) >= 0){
+                play[counter].row = rowOrigin + 1;
+                play[counter].column = columnOrigin -1;
+                play[counter].rowOperation = 1;
+                play[counter].columnOperation = -1;
+                counter++;
                 }
-                if((columOrigin + 1) <= SIZE_BOARD){
+                if((columnOrigin + 1) <= SIZE_BOARD){
                     play[counter].row = rowOrigin +1;
-                    play[counter].colum = columOrigin + 1;
+                    play[counter].column = columnOrigin + 1;
                     play[counter].rowOperation = 1;
-                    play[counter].columOperation = 1;
-                    //printf("2: \n Jogada linha: %d\nJogada Coluna:%d\n", play[counter].row, play[counter].colum);
+                    play[counter].columnOperation = 1;
                     counter++;
                 }
             }
-            if((rowOrigin - 1) >= 0){
-                if((columOrigin - 1) >= 0){
-                    play[counter].row = rowOrigin - 1;
-                    play[counter].colum = columOrigin - 1;
-                    play[counter].rowOperation = -1;
-                    play[counter].columOperation = -1;
-                    //printf("3: \n Jogada linha: %d\nJogada Coluna:%d\n", play[counter].row, play[counter].colum);
-                    counter++;
-                }
-                if((columOrigin + 1) <= SIZE_BOARD){
-                        play[counter].row = rowOrigin - 1;
-                        play[counter].colum = columOrigin + 1;
-                        play[counter].rowOperation = -1;
-                        play[counter].columOperation = 1;
-                        //printf("4: \n Jogada linha: %d\nJogada Coluna:%d\n", play[counter].row, play[counter].colum);
-                        counter++;
-                }
+        if((rowOrigin - 1) >= 0){
+            if((columnOrigin - 1) >= 0){
+                play[counter].row = rowOrigin - 1;
+                play[counter].column = columnOrigin - 1;
+                play[counter].rowOperation = -1;
+                play[counter].columnOperation = -1;
+                counter++;
+            }
+            if((columnOrigin + 1) <= SIZE_BOARD){
+                play[counter].row = rowOrigin - 1;
+                play[counter].column = columnOrigin + 1;
+                play[counter].rowOperation = -1;
+                play[counter].columnOperation = 1;
+                counter++;
             }
         }
-        else{
-            if(counter == 0){
-                flag = 0;
-                printf("Nao ha jogadas disponiveis");
-                printf("\n");
-            }
-        }
-    }
-    else if(player == BLACKPIECES){
-                if(board[rowOrigin][columOrigin] == player){
-            if(rowOrigin+1<= SIZE_BOARD){
-                if((columOrigin - 1) >= 0){
-                    play[counter].row = rowOrigin + 1;
-                    play[counter].colum = columOrigin -1;
-                    play[counter].rowOperation = 1;
-                    play[counter].columOperation = -1;
-                    //printf("1: \n Jogada linha: %d\nJogada Coluna:%d\n", play[counter].row, play[counter].colum);
-                    counter++;
-                }
-                if((columOrigin + 1) <= SIZE_BOARD){
-                    play[counter].row = rowOrigin +1;
-                    play[counter].colum = columOrigin + 1;
-                    play[counter].rowOperation = 1;
-                    play[counter].columOperation = 1;
-                    //printf("2: \n Jogada linha: %d\nJogada Coluna:%d\n", play[counter].row, play[counter].colum);
-                    counter++;
-                }
-            }
-            if((rowOrigin - 1) >= 0){
-                if((columOrigin - 1) >= 0){
-                    play[counter].row = rowOrigin - 1;
-                    play[counter].colum = columOrigin - 1;
-                    play[counter].rowOperation = -1;
-                    play[counter].columOperation = -1;
-                    //printf("3: \n Jogada linha: %d\nJogada Coluna:%d\n", play[counter].row, play[counter].colum);
-                    counter++;
-                }
-                if((columOrigin + 1) <= SIZE_BOARD){
-                        play[counter].row = rowOrigin - 1;
-                        play[counter].colum = columOrigin + 1;
-                        play[counter].rowOperation = -1;
-                        play[counter].columOperation = 1;
-                        //printf("4: \n Jogada linha: %d\nJogada Coluna:%d\n", play[counter].row, play[counter].colum);
-                        counter++;
-                }
-            }
-        }
-        else{
-            if(counter == 0){
-                flag = 0;
-                printf("Nao ha jogadas disponiveis");
-                printf("\n");
-            }
-        }
+        verifyLevantament(player);
     }
     else{
-        printf("Opção invalida");
+        if(counter == 0){
+            printf("Nao ha jogadas disponiveis");
+            printf("\n");
+        }
     }
 }
 
@@ -233,58 +178,71 @@ void verifyLevantament(int player){
     {
         #pragma omp for schedule(dynamic)
             for(int i = 0; i<counter; ++i){
-                //printf("\nPeca no tabuleiro: %d \n", board[play[i].row][play[i].colum]);
-                if(player != board[play[i].row][play[i].colum]){
-                    if(board[play[i].row][play[i].colum] == 0){ 
+                if(player != board[play[i].row][play[i].column]){
+                    if(board[play[i].row][play[i].column] == 0){ 
                         validatePlay[counterAux].row = play[i].row;
-                        validatePlay[counterAux].colum = play[i].colum;
+                        validatePlay[counterAux].column = play[i].column;
+                        validatePlay[counterAux].rowOperation = 0;
+                        validatePlay[counterAux].columnOperation = 0;
+                        validatePlay[counterAux].critical = 0;
                         counterAux++;
                     }
-                    else if(board[play[i].row][play[i].colum] == BLACKPIECES || board[play[i].row][play[i].colum] == WHITEPIECES){
-                        int aux = board[play[i].row][play[i].colum] - WHITEPIECES;
+                    else if(board[play[i].row][play[i].column] == BLACKPIECES || board[play[i].row][play[i].column] == WHITEPIECES){
+                        int aux = board[play[i].row][play[i].column] - player;
+                        if(((play[i].row + play[i].rowOperation) >= 0 && (play[i].row + play[i].rowOperation) < SIZE_BOARD) && ((play[i].column + play[i].columnOperation) >= 0 && (play[i].column + play[i].columnOperation) < SIZE_BOARD)){ 
                         if(aux == 0){
-                            verifyPieces(WHITEPIECES, play[i].row, play[i].colum, i, play[i].rowOperation, play[i].columOperation);
-                            if(counterAux == 0){
-                                #pragma omp cancel for
-                                lastRowMove = (play[i].row+play[i].rowOperation);
-                                lastColumnMove = (play[i].colum+play[i].columOperation);
+                            
+                            if(board[(play[i].row)][(play[i].column)] == BLACKPIECES && board[(play[i].row + play[i].rowOperation)][(play[i].column + play[i].columnOperation)] == 0 ){
+                                validatePlay[counterAux].row = (play[i].row + play[i].rowOperation);
+                                validatePlay[counterAux].column = (play[i].column + play[i].columnOperation);
+                                validatePlay[counterAux].rowOperation = play[i].rowOperation;
+                                validatePlay[counterAux].columnOperation = play[i].columnOperation;
+                                validatePlay[counterAux].critical = 1;
+                                counterAux++;
                             }
                         }
                         else{
-                            verifyPieces(BLACKPIECES, play[i].row, play[i].colum, i, play[i].rowOperation, play[i].columOperation); 
-                            if(counterAux == 0){
-                                #pragma omp cancel for
-                                lastRowMove = (play[i].row+play[i].rowOperation);
-                                lastColumnMove = (play[i].colum+play[i].columOperation);
+                            if(board[(play[i].row)][(play[i].column)] == WHITEPIECES && board[(play[i].row + play[i].rowOperation)][(play[i].column + play[i].columnOperation)] == 0 ){
+                                validatePlay[counterAux].row = (play[i].row + play[i].rowOperation);
+                                validatePlay[counterAux].column = (play[i].column + play[i].columnOperation);
+                                validatePlay[counterAux].rowOperation = play[i].rowOperation;
+                                validatePlay[counterAux].columnOperation = play[i].columnOperation;
+                                validatePlay[counterAux].critical = 1;
+                                counterAux++;
+                                
                             }
                         }
+                        }
+                    }
+                    else{
+                        printf("\nJogada invalida, selecione novamente\n");
                     }
 
                 }
                 
             }
-            
-//#pragma omp cancellation point for
-        /*#pragma omp for schedule(dynamic)
-            for(int i = 0; i<counterAux;++i){
-                printf("%d: \nJogada linha: %d\nJogada Coluna:%d\n", i+1, validatePlay[i].row, validatePlay[i].colum);
-            }*/
     }
-    //return verify;
+    
 }
 
-void verifyPieces(int player, int rowOrigin, int columnOrigin, int i, int operationRow, int operationColumn){
-    if(board[rowOrigin+(operationRow)][columnOrigin+(operationColumn)] == EMPTY_HOUSE){
-            int aux = board[rowOrigin-(operationRow)][columnOrigin-(operationColumn)];
-            board[rowOrigin][columnOrigin] = 0;
-            board[rowOrigin+(operationRow)][columnOrigin+(operationColumn)] = aux;
-            board[rowOrigin-(operationRow)][columnOrigin-(operationColumn)] = 0;
-            piecesTeamWhite++;
-            counterAux = 0;
-            flag = 1;
-            return ;
+void movePiece(int indice, int player){
+    int aux = board[((validatePlay[indice].row - validatePlay[indice].rowOperation)- validatePlay[indice].rowOperation)][((validatePlay[indice].column - validatePlay[indice].columnOperation)- validatePlay[indice].columnOperation)]; 
+    board[((validatePlay[indice].row - validatePlay[indice].rowOperation)- validatePlay[indice].rowOperation)][((validatePlay[indice].column - validatePlay[indice].columnOperation)- validatePlay[indice].columnOperation)] = 0;
+    board[(validatePlay[indice].row - validatePlay[indice].rowOperation)][(validatePlay[indice].column - validatePlay[indice].columnOperation)] = 0;
+    board[validatePlay[indice].row][validatePlay[indice].column] = player;
+    lastRowMove = validatePlay[indice].row;
+    lastColumnMove = validatePlay[indice].column;
+    if(player == WHITEPIECES){
+        piecesTeamWhite++;
     }
-} 
+    else if(player == BLACKPIECES){
+        piecesTeamBlack++;
+    }
+    else{
+        printf("\nNenhuma peca comida\n");
+    }
+    showBoard(board);
+}
 
 int main(){
     Playing *play;   
@@ -300,14 +258,56 @@ int main(){
     printf("\n");
     lastRowMove = 4;
     lastColumnMove = 3;
-    while(flag == 1){
-        levantamentPlaying(20, lastRowMove, lastColumnMove);
-        verifyLevantament(20);
-        showBoard(board);
-        printf("\n");
-        printf("\n");
-        printf("FLAG: %d\n", flag);
+    int verifyPiece = 0;
+    do{ 
+        verifyPiece = piecesTeamBlack;
+        levantamentPlaying(BLACKPIECES, lastRowMove, lastColumnMove);
+        for(int i = 0; i<counterAux;++i){
+            if(validatePlay[i].critical == 1){
+                printf("\nJogada valida\n");
+                printf("\nLinha: %d\nColuna: %d\n", validatePlay[i].row, validatePlay[i].column);
+                movePiece(i, BLACKPIECES);
+            }
+        }
+    }while(verifyPiece != piecesTeamBlack);
+    printf("Quantidade de peças comidas pelo time preto: %d", piecesTeamBlack);
+}
+
+
+void menu(){
+    int option = 0;
+    do{
+    printf("Seja bem vindo ao jogo de Dama, digite sua opcao: \n");
+    printf("1- Jogar");
+    printf("2 - Sair");
+    scanf("%d", &option);
+    printf("\n");
+    }while(option > 2 && option < 1);
+    int optionPiece = 0; 
+    if(option == 1){
+        do{
+        printf("Escolha a cor que deseja jogar: \n 1- Branca \n 2- Preto\n");
+        scanf("%d", &optionPiece);
+        }while(optionPiece > 2 && optionPiece < 1);
+        switch (option)
+        {
+        case 1:
+            printf("\nJogador escolheu as peças Brancas\n");
+            break;
+        case 2:
+            printf("\nJogador escolheu as peças Pretas\n");
+            break;
+        default:
+            printf("Opcao invalida");
+            break;
+        }
     }
-    printf("\nQuantidade de pecass Capturadas pelo time branco: %d\n", piecesTeamWhite);
-    
+    else{
+        printf("\nSaindo do jogo!\n");
+        exit(0);
+    }
+}
+
+void startGame(){
+
 }

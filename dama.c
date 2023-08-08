@@ -15,6 +15,7 @@ int counter;
 int flag = 0;
 int playerTurn = 0;
 int countTurn = 0;
+int totalMovimentsPossible = 0;
 
 typedef struct{
     int row;
@@ -49,7 +50,7 @@ int playingPlayer(int playerOne);
 int selectPlay(int playerOne);
 void verifyPiecesForPlay(int player);
 int movePlayerOnePieceMoviment(int indice);
-
+int verifyPiecePlayer(int player);
 
 int menu(){
     int option = 0;
@@ -191,15 +192,15 @@ void levantamentPlaying(int player, int rowOrigin, int columnOrigin){
             if((columnOrigin - 1) >= 0){
                 play[counter].row = rowOrigin + 1;
                 play[counter].column = columnOrigin -1;
-                play[counter].rowOperation = 1;
+                play[counter].rowOperation = + 1;
                 play[counter].columnOperation = -1;
                 counter++;
                 }
                 if((columnOrigin + 1) < SIZE_BOARD){
                     play[counter].row = rowOrigin +1;
                     play[counter].column = columnOrigin + 1;
-                    play[counter].rowOperation = 1;
-                    play[counter].columnOperation = 1;
+                    play[counter].rowOperation = + 1;
+                    play[counter].columnOperation = + 1;
                     counter++;
                 }
             }
@@ -234,7 +235,7 @@ void verifyLevantament(int player){
     #pragma omp parallel 
     {
         #pragma omp for schedule(dynamic)
-            for(int i = 0; i<counter; i++){
+            for(int i = 0; i<counter; ++i){
                 if(player != board[play[i].row][play[i].column]){
                     if(board[play[i].row][play[i].column] == 0){ 
                         if(player == WHITEPIECES && play[i].rowOperation > 0){
@@ -258,8 +259,8 @@ void verifyLevantament(int player){
                     else if(board[play[i].row][play[i].column] == BLACKPIECES || board[play[i].row][play[i].column] == WHITEPIECES){
                         int aux = board[play[i].row][play[i].column] - player;
                         if(((play[i].row + play[i].rowOperation) >= 0 && (play[i].row + play[i].rowOperation) < SIZE_BOARD) && ((play[i].column + play[i].columnOperation) >= 0 && (play[i].column + play[i].columnOperation) < SIZE_BOARD)){ 
-                            if(aux == 0){
-                                if(board[(play[i].row)][(play[i].column)] == BLACKPIECES && board[(play[i].row + play[i].rowOperation)][(play[i].column + play[i].columnOperation)] == 0 ){
+                            if(player == WHITEPIECES){
+                                if(board[(play[i].row)][(play[i].column)] == BLACKPIECES && board[(play[i].row + play[i].rowOperation)][(play[i].column + play[i].columnOperation)] == 0){
                                     validatePlay[counterAux].row = (play[i].row + play[i].rowOperation);
                                     validatePlay[counterAux].column = (play[i].column + play[i].columnOperation);
                                     validatePlay[counterAux].rowOperation = play[i].rowOperation;
@@ -376,6 +377,9 @@ void verifyPiecesForPlay(int player){
                         if(counterAux > 0 ){
                             for(int w = 0;w<counterAux;w++){
                                 if((validatePlay[w].critical == 1)){
+                                    lastRowMove = i;
+                                    lastColumnMove = j;
+                                    printf("%d", validatePlay[w].critical);
                                     clear();
                                     return ;
                                 }
@@ -426,30 +430,46 @@ void verifyPiecesForPlay(int player){
 
 int playingMachine(int playerMachine){
     flag = 0;
+    int valuePieces;
+    int validate;
+    verifyPiecePlayer(playerMachine);
+    if(totalMovimentsPossible == 0){
+        if(playerMachine == WHITEPIECES){
+            printf("\nPeças Pretas ganharam!\n");
+            exit(0);
+        }
+        else{
+            printf("\nPeças Brancas ganharam!\n");
+            exit(0);
+        }
+    }
+    printf("\nTotal de jogadas disponíveis no tabuleiro %d\n", totalMovimentsPossible);
+    clear();
+    totalMovimentsPossible = 0;
+    do{ 
     //Buscar linhas para jogar
     verifyPiecesForPlay(playerMachine);
     levantamentPlaying(playerMachine, lastRowMove, lastColumnMove);
     //Armazena o estado das peças da quantidade de peças
-    int valuePieces = piecesTeamBlack;
+        valuePieces = piecesTeamBlack;
     // pega o valor de retorno da função que retorna 1 caso seja alguma peça capturada e 0 caso não haja peça capturada.
-    int validate =  moveGetPiece(playerMachine);
-    printf("\nValidate: %d, flag: %d\n counterGet: %d\n", validate, flag, counterGet);
+        validate =  moveGetPiece(playerMachine);
+    //printf("\nValidate: %d, flag: %d\n counterGet: %d\n", validate, flag, counterGet);
     //printf("\nValidate %d\n", validate);
     //Caso o valor de VALIDE = 0, FLAG = 0 e counterGet = 0, significa que não foi comida peças nessa rodada.
-    if(validate == 0 && flag == 0 && counterGet == 0){
-        movePieceOneMoviment();
-        printf("\n");
-        showBoard(board);
-        printf("\n");
-        if(validate == 0 && playerMachine == WHITEPIECES){
-            playerTurn = BLACKPIECES;
+        if((valuePieces == piecesTeamBlack) && (flag == 0)){
+            movePieceOneMoviment();
+            printf("\n");
+            showBoard(board);
+            printf("\n");
+            if(validate == 0 && playerMachine == WHITEPIECES){
+                playerTurn = BLACKPIECES;
+            }
+            else{
+                playerTurn = WHITEPIECES;
+            }
         }
-        else{
-            playerTurn = WHITEPIECES;
-        }
-        clear();
-        return 1;
-    }
+    }while(valuePieces != piecesTeamBlack);
     if(counterGet > 0 && (valuePieces == piecesTeamBlack)){
         clear();
         counterGet = 0;
@@ -461,56 +481,108 @@ int playingMachine(int playerMachine){
         }
         return 1;
     }
-    return 2;
+    else{
+        clear();
+        return 1;
+    }
     
 }
 
 int playingPlayer(int playerOne){
-    selectPlay(playerOne);
-    levantamentPlaying(playerOne, lastRowMove, lastColumnMove);
-    for(int i = 0; i<counterAux;i++){
-        printf("\nOpcao: %d", i+1);
-        printf("\nLinha: %d\nColuna: %d\n", validatePlay[i].row+1, validatePlay[i].column+1);
+    int valuePieces;
+    int validate;
+    flag = 0;
+    verifyPiecePlayer(playerOne);
+    if(totalMovimentsPossible == 0){
+        if(playerOne == WHITEPIECES){
+            printf("\nPeças Pretas ganharam!\n");
+            exit(0);
+        }
+        else{
+            printf("\nPeças Brancas ganharam!\n");
+            exit(0);
+        }
     }
-    if(counterAux > 0){
+    printf("\nTotal de jogadas disponíveis no tabuleiro %d\n", totalMovimentsPossible);
+    clear();
+    totalMovimentsPossible = 0;
     int option;
     do{
-        printf("\nEscolha a sua opcao de jogada: \n");
-        scanf("%d", &option);
-    }while(option < 1 && option >= counterAux);
-        int valuePieces = piecesTeamWhite;
-        //int validate = moveGetPiece(playerOne);
-        int validate = 0;
-        if(validate == 0){
-            movePlayerOnePieceMoviment(option-1);
-            printf("\n");
-            showBoard(board);
-            printf("\n");
-            if(validate == 0 && playerOne == WHITEPIECES){
-                playerTurn = BLACKPIECES;
+        if(flag == 0){
+            selectPlay(playerOne);
+            levantamentPlaying(playerOne, lastRowMove, lastColumnMove);
+            valuePieces = piecesTeamWhite;
+        }
+        if(counterAux > 0){
+            for(int i = 0; i<counterAux;i++){
+                    printf("\nOpcao: %d", i+1);
+                    printf("\nLinha: %d\nColuna: %d\n", validatePlay[i].row+1, validatePlay[i].column+1);
+                }
+            do{
+                    printf("\nEscolha a sua opcao de jogada: \n");
+                    scanf("%d", &option);
+            }while(option < 1 && option >= counterAux);
+            
+            while(validatePlay[option - 1].critical == 1){
+                flag = 1;
+                movePieceSeveralMoviment(option-1, playerOne);
+                lastRowMove = validatePlay[option -1].row;
+                lastColumnMove = validatePlay[option - 1].column;
+                levantamentPlaying(playerOne, lastRowMove, lastColumnMove);
+                valuePieces = piecesTeamWhite;
+                if(counterAux > 0){
+                    for(int i = 0; i<counterAux;i++){
+                            printf("\nOpcao: %d", i+1);
+                            printf("\nLinha: %d\nColuna: %d\n", validatePlay[i].row+1, validatePlay[i].column+1);
+                        }
+                do{
+                        printf("\nEscolha a sua opcao de jogada: \n");
+                        scanf("%d", &option);
+                }while(option < 1 && option >= counterAux);
             }
             else{
-                playerTurn = WHITEPIECES;
+                if(playerOne == WHITEPIECES){
+                    playerTurn = BLACKPIECES;
+                    clear();
+                    return 1;
+                }
+                else{
+                    playerTurn = WHITEPIECES;
+                    clear();
+                    return 1;
+                }
+                clear();
+                return 1;
             }
-            clear();
-        return flag + 1;
-    }
-        if(counterGet > 0 && (valuePieces == piecesTeamBlack)){
-            counterGet = 0;
+        }
+            if((valuePieces == piecesTeamWhite) && (flag == 0)){
+                movePieceOneMoviment();
+                printf("\n");
+                if(playerOne == WHITEPIECES){
+                    playerTurn = BLACKPIECES;
+                    clear();
+                    return 1;
+                }
+                else{
+                    playerTurn = WHITEPIECES;
+                    clear();
+                    return 1;
+                }
+            }
+        }
+        showBoard(board);
+    }while(valuePieces != piecesTeamBlack);
+        
+        counterGet = 0;
+        if(playerOne == WHITEPIECES){
+            playerTurn = BLACKPIECES;
+        }
+        else{
+            playerTurn = WHITEPIECES;
         }
         clear();
         return 1;
-    }
-    else{
-        if(playerOne == WHITEPIECES){
-            printf("Pecas Pretas ganharam");
-            return 0;
-        }
-        else{
-            printf("Pecas Brancas ganharam");
-            return 0;
-        }
-    }   
+
 }
 
 int startGame(int playerOne, int playerMachine){
@@ -526,7 +598,7 @@ int startGame(int playerOne, int playerMachine){
         }
         if(playerTurn == playerOne){
             verify = playingPlayer(playerOne);
-            printf("\nQuantidade de pecas capturadas pelas Pretas %d\n", piecesTeamWhite);
+            printf("\nQuantidade de pecas capturadas pelas Brancas %d\n", piecesTeamWhite);
         }
         else{
             do{ 
@@ -561,6 +633,18 @@ int main(){
 
 int selectPlay(int playerOne){
     int row, column, continueGame;
+    verifyPiecePlayer(playerOne);
+    if(totalMovimentsPossible == 0){
+        if(playerOne == WHITEPIECES){
+            printf("\nPeças Pretas ganharam!\n");
+            exit(0);
+        }
+        else{
+            printf("\nPeças Brancas ganharam!\n");
+            exit(0);
+        }
+    }
+    totalMovimentsPossible = 0;
     do{
         printf("\nEscolha a linha que queira jogar: \n");
         scanf("%d", &row);
@@ -572,4 +656,42 @@ int selectPlay(int playerOne){
     }while(board[row-1][column-1] != playerOne);
     lastRowMove = row-1;
     lastColumnMove = column-1;
+}
+
+int verifyPiecePlayer(int player){
+    totalMovimentsPossible = 0;
+    if(player == WHITEPIECES){
+            for(int i = 0; i< SIZE_BOARD;++i){
+                for(int j = 0;j<SIZE_BOARD; ++j){
+                    if(board[i][j] == WHITEPIECES){
+                        lastRowMove = i;
+                        lastColumnMove = j;
+                        levantamentPlaying(player, lastRowMove, lastColumnMove);
+                        if(counterAux > 0 ){
+                            totalMovimentsPossible++;
+                        }
+                        clear();
+                        counter = 0;
+                        counterAux = 0;
+                    }
+                }
+            }
+    }
+    else{
+            for(int i = 7; i>= 0;--i){
+                for(int j = 0;j<SIZE_BOARD; ++j){
+                    if(board[i][j] == BLACKPIECES){
+                        lastRowMove = i;
+                        lastColumnMove = j;
+                        levantamentPlaying(player, lastRowMove, lastColumnMove);
+                        if(counterAux > 0 ){
+                            totalMovimentsPossible++;
+                        }
+                        clear();
+                        counter = 0;
+                        counterAux = 0;
+                    }
+                }
+        }
+    }
 }

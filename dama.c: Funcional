@@ -181,8 +181,8 @@ void clear(){
         validatePlay[i].rowOperation = 0;
         validatePlay[i].columnOperation = 0;
         validatePlay[i].critical = 0;
-        counterAux = 0;
     }
+    counterAux = 0;
 }
 
 void levantamentPlaying(int player, int rowOrigin, int columnOrigin){   
@@ -384,12 +384,7 @@ void verifyPiecesForPlay(int player){
                                     clear();
                                     return ;
                                 }
-                                else{
-                                    lastRowMove = i;
-                                    lastColumnMove = j;
-                                }
                             }
-
                         }
                         counter = 0;
                         counterAux = 0;
@@ -397,7 +392,7 @@ void verifyPiecesForPlay(int player){
                 }
             }
     }
-    else{
+    else if(player == BLACKPIECES){
             for(int i = 7; i>= 0;--i){
                 for(int j = 0;j<SIZE_BOARD; ++j){
                     if(board[i][j] == BLACKPIECES){
@@ -410,17 +405,30 @@ void verifyPiecesForPlay(int player){
                                     lastRowMove = i;
                                     lastColumnMove = j;
                                     printf("%d", validatePlay[w].critical);
-                                    clear();
+//                                    clear();
                                     return ;
                                 }
-                                else{
-                                    lastRowMove = i;
-                                    lastColumnMove = j;
-                                }
                             }
-                            clear();
-
+                            counterAux = 0;
+                            counter = 0;
                         }
+                        
+                    }
+                }
+            }
+            for(int i = 7; i>= 0;--i){
+                for(int j = 0;j<SIZE_BOARD; ++j){
+                    if(board[i][j] == BLACKPIECES){
+                        lastRowMove = i;
+                        lastColumnMove = j;
+                        levantamentPlaying(player, lastRowMove, lastColumnMove);
+                        if(counterAux > 0 ){
+                                lastRowMove = i;
+                                lastColumnMove = j;
+                                //printf("%d", validatePlay[w].critical);
+                                //clear();
+                                return ;
+                            }
                         counter = 0;
                         counterAux = 0;
                     }
@@ -450,6 +458,7 @@ int playingMachine(int playerMachine){
     do{ 
     //Buscar linhas para jogar
     verifyPiecesForPlay(playerMachine);
+    printf("\nRow: %d, Column: %d\n", lastRowMove, lastColumnMove);
     levantamentPlaying(playerMachine, lastRowMove, lastColumnMove);
     //Armazena o estado das peças da quantidade de peças
         valuePieces = piecesTeamBlack;

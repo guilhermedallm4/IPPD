@@ -7,7 +7,7 @@ Implementação do Jogo de Damas utilizando OpenMP
 
 ## Compilação
 
-gcc -o dama dama.exe -fopenmp
+gcc -o dama dama.c -fopenmp
 
 ## Execução
 

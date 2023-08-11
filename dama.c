@@ -27,6 +27,8 @@ typedef struct{
 
 Playing play[4];
 Playing validatePlay[4];
+int vectorRow[2];
+int vectorColumn[2];
 
 int lastRowMove = 0;
 int lastColumnMove = 0;
@@ -325,10 +327,6 @@ int moveGetPiece(int player){
 }
 
 void movePieceSeveralMoviment(int indice, int player){
-    #pragma omp parallel 
-    {
-        #pragma omp single
-        {
             int aux = board[(validatePlay[indice].row - validatePlay[indice].rowOperation) - validatePlay[indice].rowOperation][(validatePlay[indice].column - validatePlay[indice].columnOperation)- validatePlay[indice].columnOperation];
             board[(validatePlay[indice].row - validatePlay[indice].rowOperation)- validatePlay[indice].rowOperation][(validatePlay[indice].column - validatePlay[indice].columnOperation)- validatePlay[indice].columnOperation] = 0;
             board[(validatePlay[indice].row - validatePlay[indice].rowOperation)][(validatePlay[indice].column - validatePlay[indice].columnOperation)] = 0;
@@ -347,8 +345,7 @@ void movePieceSeveralMoviment(int indice, int player){
             }
             //showBoard(board);
             flag = 1;
-        }
-    }
+    return ;
 }
 
 void movePieceOneMoviment(){
@@ -378,8 +375,7 @@ int movePlayerOnePieceMoviment(int indice){
 }
 //Função para verificar as jogadas criticas e jogadas disponíveis para realizar.
 void verifyPiecesForPlay(int player){
-    int row, column;
-    {  
+    int row, column, initialRow, endRow, initialColumn, endColumn;  
         if(player == WHITEPIECES){
                 for(int i = 0; i< SIZE_BOARD;++i){
                     for(int j = 0;j<SIZE_BOARD; ++j){
@@ -394,8 +390,7 @@ void verifyPiecesForPlay(int player){
                                         lastColumnMove = j;
                                         criticalFlag++;
                                         clear();
-                                        return ;
-                                        
+                                        return ;                                  
                                     }
                                 }
                                     
@@ -406,48 +401,194 @@ void verifyPiecesForPlay(int player){
                     }
                 }
         }
-        else if(player == BLACKPIECES){
-                for(int i = 7; i>= 0;--i){
-                    for(int j = 0;j<SIZE_BOARD; ++j){
-                        if(board[i][j] == BLACKPIECES){
-                            lastRowMove = i;
-                            lastColumnMove = j;
-                            levantamentPlaying(player, lastRowMove, lastColumnMove);
-                            if(counterAux > 0 ){
-                                for(int w = 0;w<counterAux;w++){
-                                    if(validatePlay[w].critical == 1){
-                                        lastRowMove = i;
-                                        lastColumnMove = j;
-                                        printf("%d", validatePlay[w].critical);
-                                        return ;
-                                    }
-                                }
-                                counterAux = 0;
-                                counter = 0;
-                            }
-                        }
-                    }
 
-                }
-                for(int i = 7; i>= 0;--i){
-                    for(int j = 0;j<SIZE_BOARD; ++j){
-                        if(board[i][j] == BLACKPIECES){
-                            lastRowMove = i;
-                            lastColumnMove = j;
-                            levantamentPlaying(player, lastRowMove, lastColumnMove);
-                            if(counterAux > 0 ){
+        if(player == BLACKPIECES){
+                int lower_bound = 0;
+                int upper_bound = 2;
+                srand(time(NULL));
+                int random_number = lower_bound + (rand() % (upper_bound - lower_bound));
+                if(random_number == 0){
+                    initialRow = vectorRow[0];
+                    endRow = vectorRow[1];
+                    random_number = lower_bound + (rand() % (upper_bound - lower_bound));
+                    if(random_number == 0){
+                        initialColumn = vectorRow[0];
+                        endColumn = vectorRow[1];
+                        for(int i = initialRow; i<=endRow;++i){
+                            for(int j = initialColumn;j<=endColumn; ++j){
+                                if(board[i][j] == BLACKPIECES){
                                     lastRowMove = i;
                                     lastColumnMove = j;
-                                    return ;
-                                    
+                                    levantamentPlaying(player, lastRowMove, lastColumnMove);
+                                    if(counterAux > 0 ){
+                                        for(int w = 0;w<counterAux;w++){
+                                            if(validatePlay[w].critical == 1){
+                                                lastRowMove = i;
+                                                lastColumnMove = j;
+                                                clear();
+                                                return;
+                                            }
+                                        }
+                                    counterAux = 0;
+                                    counter = 0;
+                                    }
                                 }
-                            counter = 0;
-                            counterAux = 0;
+                            }
+                        }
+                        for(int i = initialRow; i<=endRow;++i){
+                            for(int j = initialColumn;j<=endColumn; ++j){
+                                if(board[i][j] == BLACKPIECES){
+                                    lastRowMove = i;
+                                    lastColumnMove = j;
+                                    levantamentPlaying(player, lastRowMove, lastColumnMove);
+                                    if(counterAux > 0 ){
+                                        lastRowMove = i;
+                                        lastColumnMove = j;
+                                        clear();
+                                        return;
+                                    }
+                                counter = 0;
+                                counterAux = 0;
+                            }
+                        }
+                    }                        
+                    }
+                    else{
+                        initialColumn = vectorRow[1];
+                        endColumn = vectorRow[0];
+                        for(int i = initialRow; i<=endRow;++i){
+                            for(int j = initialColumn;j>=endColumn; --j){
+                                if(board[i][j] == BLACKPIECES){
+                                    lastRowMove = i;
+                                    lastColumnMove = j;
+                                    levantamentPlaying(player, lastRowMove, lastColumnMove);
+                                    if(counterAux > 0 ){
+                                        for(int w = 0;w<counterAux;w++){
+                                            if(validatePlay[w].critical == 1){
+                                                lastRowMove = i;
+                                                lastColumnMove = j;
+                                                printf("%d", validatePlay[w].critical);
+                                                clear();
+                                                return;
+                                            }
+                                        }
+                                    counterAux = 0;
+                                    counter = 0;
+                                    }
+                                }
+                            }
+                        }
+                        for(int i = initialRow; i<=endRow;++i){
+                            for(int j = initialColumn;j>=endColumn; --j){
+                                if(board[i][j] == BLACKPIECES){
+                                    lastRowMove = i;
+                                    lastColumnMove = j;
+                                    levantamentPlaying(player, lastRowMove, lastColumnMove);
+                                    if(counterAux > 0 ){
+                                        lastRowMove = i;
+                                        lastColumnMove = j;
+                                        clear();
+                                        return;
+                                    }
+                                counter = 0;
+                                counterAux = 0;
+                            }
                         }
                     }
                 }
-
+            }
+                else{
+                    initialRow = vectorRow[1];
+                    endRow = vectorRow[0];
+                    random_number = lower_bound + (rand() % (upper_bound - lower_bound));
+                    if(random_number == 0){
+                        initialColumn = vectorRow[0];
+                        endColumn = vectorRow[1];
+                        for(int i = initialRow; i>=endRow;--i){
+                            for(int j = initialColumn;j<=endColumn; ++j){
+                                if(board[i][j] == BLACKPIECES){
+                                    lastRowMove = i;
+                                    lastColumnMove = j;
+                                    levantamentPlaying(player, lastRowMove, lastColumnMove);
+                                    if(counterAux > 0 ){
+                                        for(int w = 0;w<counterAux;w++){
+                                            if(validatePlay[w].critical == 1){
+                                                lastRowMove = i;
+                                                lastColumnMove = j;
+                                                printf("%d", validatePlay[w].critical);
+                                                clear();
+                                                return;
+                                            }
+                                        }
+                                    counterAux = 0;
+                                    counter = 0;
+                                    }
+                                }
+                            }
+                        }
+                        for(int i = initialRow; i>=endRow;--i){
+                            for(int j = initialColumn;j<=endColumn; ++j){
+                                if(board[i][j] == BLACKPIECES){
+                                    lastRowMove = i;
+                                    lastColumnMove = j;
+                                    levantamentPlaying(player, lastRowMove, lastColumnMove);
+                                    if(counterAux > 0 ){
+                                        lastRowMove = i;
+                                        lastColumnMove = j;
+                                        clear();
+                                        return;
+                                    }
+                                counter = 0;
+                                counterAux = 0;
+                            }
+                        }
+                    }
+                    }
+                    else{
+                        initialColumn = vectorRow[1];
+                        endColumn = vectorRow[0];
+                        for(int i = initialRow; i>=endRow;--i){
+                            for(int j = initialColumn;j>=endColumn; --j){
+                                if(board[i][j] == BLACKPIECES){
+                                    lastRowMove = i;
+                                    lastColumnMove = j;
+                                    levantamentPlaying(player, lastRowMove, lastColumnMove);
+                                    if(counterAux > 0 ){
+                                        for(int w = 0;w<counterAux;w++){
+                                            if(validatePlay[w].critical == 1){
+                                                lastRowMove = i;
+                                                lastColumnMove = j;
+                                                printf("%d", validatePlay[w].critical);
+                                                clear();
+                                                return;
+                                            }
+                                        }
+                                    counterAux = 0;
+                                    counter = 0;
+                                    }
+                                }
+                            }
+                        }
+                         for(int i = initialRow; i>=endRow;--i){
+                            for(int j = initialColumn;j>=endColumn; --j){
+                                if(board[i][j] == BLACKPIECES){
+                                    lastRowMove = i;
+                                    lastColumnMove = j;
+                                    levantamentPlaying(player, lastRowMove, lastColumnMove);
+                                    if(counterAux > 0 ){
+                                        lastRowMove = i;
+                                        lastColumnMove = j;
+                                        clear();
+                                        return;
+                                    }
+                                counter = 0;
+                                counterAux = 0;
+                        }
+                    }
+                }
+            }
         }
+        
     }
 }
 
@@ -660,6 +801,10 @@ int main(){
         playerMachine = WHITEPIECES;
     }
     playerTurn = WHITEPIECES;
+    vectorRow[0] = 0;
+    vectorRow[1] = SIZE_BOARD-1;
+    vectorColumn[0] = 0;
+    vectorColumn[1] = SIZE_BOARD-1;
     generateBoard(board);
     showBoard(board);
     printf("\n");
@@ -670,20 +815,9 @@ int main(){
 }
 
 int selectPlay(int playerOne){
-    int row, column, continueGame;
-    verifyPiecePlayer(playerOne);
-    if(totalMovimentsPossible == 0){
-        if(playerOne == WHITEPIECES){
-            printf("\nPeças Pretas ganharam!\n");
-            exit(0);
-        }
-        else{
-            printf("\nPeças Brancas ganharam!\n");
-            exit(0);
-        }
-    }
-    totalMovimentsPossible = 0;
+    int row, column;
     do{
+        clear();
         printf("\nEscolha a linha que queira jogar: \n");
         scanf("%d", &row);
         printf("\nEscolha a coluna que queira jogar: \n");
@@ -691,7 +825,13 @@ int selectPlay(int playerOne){
         if(board[row-1][column-1] != playerOne){
             printf("\nPeca invalida\n");
         }
-    }while(board[row-1][column-1] != playerOne);
+        else{
+            levantamentPlaying(playerOne, row-1, column-1);
+            if(counterAux == 0){
+                printf("Jogada invalida, selecione outra novamente!");
+            }
+        }
+    }while((board[row-1][column-1] != playerOne) || (counterAux <= 0));
     lastRowMove = row-1;
     lastColumnMove = column-1;
 }

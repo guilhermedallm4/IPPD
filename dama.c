@@ -53,8 +53,25 @@ int selectPlay(int playerOne);
 void verifyPiecesForPlay(int player);
 int movePlayerOnePieceMoviment(int indice);
 int verifyPiecePlayer(int player);
+void introduction();
+
+void introduction() {
+    printf(" \n\n\n");
+    printf("_  _  _  _                 _              _           _              _                _  _  _  _     \n");
+    printf("(_)(_)(_)(_)              _(_)_           (_) _     _ (_)           _(_)_            _(_)(_)(_)(_)_   \n");
+    printf(" (_)      (_)_          _(_) (_)_         (_)(_)   (_)(_)         _(_) (_)_         (_)          (_)  \n");
+    printf(" (_)        (_)       _(_)     (_)_       (_) (_)_(_) (_)       _(_)     (_)_       (_)_  _  _  _     \n");
+    printf(" (_)        (_)      (_) _  _  _ (_)      (_)   (_)   (_)      (_) _  _  _ (_)        (_)(_)(_)(_)_   \n");
+    printf(" (_)       _(_)      (_)(_)(_)(_)(_)      (_)         (_)      (_)(_)(_)(_)(_)       _           (_)  \n");
+    printf(" (_)_  _  (_)        (_)         (_)      (_)         (_)      (_)         (_)      (_)_  _  _  _(_)  \n");
+    printf("(_)(_)(_)(_)         (_)         (_)      (_)         (_)      (_)         (_)        (_)(_)(_)(_)    \n");
+    printf(" \n\n\n");
+
+}
+
 
 int menu(){
+    introduction();
     int option = 0;
     do{
     printf("Seja bem vindo ao jogo de Dama, digite sua opcao: \n");
@@ -150,13 +167,31 @@ void generateBoard(int board[SIZE_BOARD][SIZE_BOARD]){
     }
 }
 
-void showBoard(int board[SIZE_BOARD][SIZE_BOARD]){
-        for(int i = 0; i< SIZE_BOARD;i++){
-            for(int j = 0; j <SIZE_BOARD;j++ ){
-                printf(" %d\t", board[i][j]);
+void showBoard(int board[SIZE_BOARD][SIZE_BOARD]) {
+    printf("   ");
+    for (int i = 0; i < SIZE_BOARD; i++) {
+        printf(" %d ", i + 1);
+    }
+    printf("\n");
+
+    for (int i = 0; i < SIZE_BOARD; i++) {
+        printf("        %d   ", i + 1);
+        for (int j = 0; j < SIZE_BOARD; j++) {
+            int piece = board[i][j];
+            if (piece == WHITEPIECES) {
+                printf("| W ");
+            } else if (piece == BLACKPIECES) {
+                printf("| B ");
+            } else if (piece == WHITEPIECES + 5) { 
+                printf("|DW ");
+            } else if (piece == BLACKPIECES + 5) { 
+                printf("|DB ");
+            } else {
+                printf("|   ");
             }
-            printf("\n");
         }
+        printf("|\n");
+    }
 }
 
 void clear(){

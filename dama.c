@@ -1,3 +1,7 @@
+/*CÓDIGO DESENVOLVIDO POR:
+GUILHERME DALLMANN LIMA
+JOÃO PAULO ALMEIDA*/
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <omp.h>
@@ -255,6 +259,7 @@ void levantamentPlaying(int player, int rowOrigin, int columnOrigin){
                     }
                 }
             }
+            #pragma omp section_wait
         }
             verifyLevantament(player);
         }
@@ -366,6 +371,8 @@ void movePieceSeveralMoviment(int indice, int player){
             board[(validatePlay[indice].row - validatePlay[indice].rowOperation)- validatePlay[indice].rowOperation][(validatePlay[indice].column - validatePlay[indice].columnOperation)- validatePlay[indice].columnOperation] = 0;
             board[(validatePlay[indice].row - validatePlay[indice].rowOperation)][(validatePlay[indice].column - validatePlay[indice].columnOperation)] = 0;
             board[validatePlay[indice].row][validatePlay[indice].column] = aux;
+            lastRowMove = validatePlay[indice].row;
+            lastColumnMove = validatePlay[indice].column;
             if(player == WHITEPIECES){
                 piecesTeamWhite++;
                 counterGet++;

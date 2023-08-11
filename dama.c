@@ -1,6 +1,6 @@
 /*CÓDIGO DESENVOLVIDO POR:
 GUILHERME DALLMANN LIMA
-JOÃO PAULO ALMEIDA*/
+JOÃO PAULO BRITO DE ALMEIDA*/
 
 #include <stdio.h>
 #include <stdlib.h>

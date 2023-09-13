@@ -856,15 +856,18 @@ void recvData(int processRank){
 int startGame(int playerOne, int playerMachine){
     int verify = 1;
 
-    MPI_Barrier(MPI_COMM_WORLD);
+    
     //showBoard(board);
     MPI_Comm_rank(MPI_COMM_WORLD, &processRank);    
-
+    if(processRank == 0){
+        showBoard(board);
+    }
+    MPI_Barrier(MPI_COMM_WORLD);
     while (verify) {
 
         MPI_Barrier(MPI_COMM_WORLD);
         if(processRank == 0){
-            showBoard(board);
+            
 
             printf("\n%d - TURNO DAS BRANCAS:\n", countTurn + 1);
             verify = playingPlayer(playerOne);
@@ -873,8 +876,6 @@ int startGame(int playerOne, int playerMachine){
         }
         else{
             recvData(processRank);
-
-
             do {
                 verify = playingMachine(playerMachine);
             } while (verify == 2);
@@ -884,6 +885,7 @@ int startGame(int playerOne, int playerMachine){
 
         if(processRank == 0){
            recvData(processRank);
+           showBoard(board);
         }
         MPI_Barrier(MPI_COMM_WORLD);
         

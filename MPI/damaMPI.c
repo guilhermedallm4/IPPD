@@ -730,6 +730,7 @@ int playingPlayer(int playerOne){
             levantamentPlaying(playerOne, lastRowMove, lastColumnMove);
             valuePieces = piecesTeamWhite;
         }
+        int optionShow = 0;
         if(counterAux > 0){
             for(int i = 0; i<counterAux;i++){
                 if(criticalFlag == 0 && validatePlay[i].critical == 0){
@@ -737,6 +738,7 @@ int playingPlayer(int playerOne){
                     printf("\nLinha: %d\nColuna: %d\n", validatePlay[i].row+1, validatePlay[i].column+1);
                 }
                 else if(validatePlay[i].critical == 1){
+                    
                     printf("\nOpcao: %d", i+1);
                     printf("\nLinha: %d\nColuna: %d\n", validatePlay[i].row+1, validatePlay[i].column+1);
                 }

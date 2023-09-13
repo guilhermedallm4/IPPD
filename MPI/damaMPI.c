@@ -1,6 +1,6 @@
-/*C�DIGO DESENVOLVIDO POR:
+/*CODIGO DESENVOLVIDO POR:
 GUILHERME DALLMANN LIMA
-JO�O PAULO BRITO DE ALMEIDA*/
+JOAO PAULO BRITO DE ALMEIDA*/
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -347,9 +347,11 @@ int moveGetPiece(int player){
         {
             #pragma omp for schedule(dynamic)
                 for(int i = 0; i<counterAux;i++){
-                    printf("Oi\n");
+                        printf("Player: %d", playerTurn);
+                        printf("Player: %d", player);
                     if((validatePlay[i].critical == 1)){
                         //Ao encontrar uma jogada critica ele executa ela, e caso sim ele retorna o valor da FLAG 1.
+
                         movePieceSeveralMoviment(i, player);
                         flag = 1;
                         if(player == WHITEPIECES){
@@ -393,7 +395,8 @@ void movePieceSeveralMoviment(int indice, int player){
 
 void movePieceOneMoviment(){
     int lower_bound = 0;
-    int upper_bound = counterAux+1;
+    int upper_bound = counterAux;
+
     srand(time(NULL));
     int random_number = lower_bound + (rand() % (upper_bound - lower_bound));
     int piece = board[lastRowMove][lastColumnMove];
@@ -664,9 +667,6 @@ int playingMachine(int playerMachine){
     valuePieces = piecesTeamBlack; //Armazena o estado das pe�as da quantidade de pe�as
     
     validate =  moveGetPiece(BLACKPIECES); // pega o valor de retorno da fun��o que retorna 1 caso seja alguma pe�a capturada e 0 caso n�o haja pe�a capturada.
-    printf("Counter Aux: %d\n", counterAux);
-    printf("linha: %d\n", validatePlay[0].row);
-    printf("coluna: %d\n", validatePlay[0].column);
     
     //Caso o valor de valuePieces == piecesTeamBlack e FLAG = 0, significa que n�o foi comida pe�as nessa rodada.
     if((valuePieces == piecesTeamBlack) && (flag == 0)){ 
@@ -856,38 +856,26 @@ int startGame(int playerOne, int playerMachine){
     //showBoard(board);
     MPI_Comm_rank(MPI_COMM_WORLD, &processRank);    
 
-    printf("Process: %d", processRank);
     while (verify) {
 
-        
+        MPI_Barrier(MPI_COMM_WORLD);
         if(processRank == 0){
-            if(processRank == 0){
             showBoard(board);
-            printf("Process: %d\n", processRank);
+
             printf("\n%d - TURNO DAS BRANCAS:\n", countTurn + 1);
             verify = playingPlayer(playerOne);
-            //playerTurn = BLACKPIECES;
-            showBoard(board);
             sendData(processRank);
-            }
             // Use MPI_Send para enviar dados para o processo 1 aqui
         }
         else{
             recvData(processRank);
-            //printf("\nOLA\n");
-            showBoard(board);
-            // Use MPI_Recv para receber dados do processo 0 aqui
-            if(processRank == 1){
-            printf("Process: %d\n", processRank);
-            printf("\n%d - TURNO DAS PRETAS\n", countTurn + 1);
+
+
             do {
                 verify = playingMachine(playerMachine);
             } while (verify == 2);
             printf("\nQuantidade de pecas capturadas pelas Pretas %d\n", piecesTeamBlack);
             sendData(processRank);
-            }
-            
-            //sendData(processRank);
         }
 
         if(processRank == 0){

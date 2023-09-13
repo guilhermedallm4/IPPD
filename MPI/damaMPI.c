@@ -347,8 +347,6 @@ int moveGetPiece(int player){
         {
             #pragma omp for schedule(dynamic)
                 for(int i = 0; i<counterAux;i++){
-                        printf("Player: %d", playerTurn);
-                        printf("Player: %d", player);
                     if((validatePlay[i].critical == 1)){
                         //Ao encontrar uma jogada critica ele executa ela, e caso sim ele retorna o valor da FLAG 1.
 
@@ -639,6 +637,10 @@ void verifyPiecesForPlay(int player){
 }
 
 int playingMachine(int playerMachine){
+    vectorRow[0] = 0;
+    vectorColumn[0] = 0;
+    vectorRow[1] = SIZE_BOARD;
+    vectorColumn[1] = SIZE_BOARD;
     flag = 0;
     int valuePieces;
     int validate;
@@ -657,7 +659,7 @@ int playingMachine(int playerMachine){
     totalMovimentsPossible = 0;
     do{ 
     
-    verifyPiecesForPlay(playerMachine); //Buscar linhas para jogar
+    verifyPiecesForPlay(BLACKPIECES); //Buscar linhas para jogar
     
     levantamentPlaying(BLACKPIECES, lastRowMove, lastColumnMove);
 

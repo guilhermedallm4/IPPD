@@ -419,7 +419,7 @@ int movePlayerOnePieceMoviment(int indice){
     flag = 1;
     
 }
-//Fun��o para verificar as jogadas criticas e jogadas dispon�veis para realizar.
+
 void verifyPiecesForPlay(int player){
     int row, column, initialRow, endRow, initialColumn, endColumn;  
         if(player == WHITEPIECES){
@@ -449,8 +449,8 @@ void verifyPiecesForPlay(int player){
         }
 
         if(player == BLACKPIECES){
-                int lower_bound = 1;
-                int upper_bound = 3;
+                int lower_bound = 0;
+                int upper_bound = 2;
                 srand(time(NULL));
                 int random_number = lower_bound + (rand() % (upper_bound - lower_bound));
                 if(random_number == 0){
@@ -465,8 +465,7 @@ void verifyPiecesForPlay(int player){
                                 if(board[i][j] == BLACKPIECES){
                                     lastRowMove = i;
                                     lastColumnMove = j;
-                                    levantamentPlaying(BLACKPIECES, lastRowMove, lastColumnMove);
-                                    //printf("CounterAux: %d\n", counterAux);
+                                    levantamentPlaying(player, lastRowMove, lastColumnMove);
                                     if(counterAux > 0 ){
                                         for(int w = 0;w<counterAux;w++){
                                             if(validatePlay[w].critical == 1){
@@ -487,8 +486,7 @@ void verifyPiecesForPlay(int player){
                                 if(board[i][j] == BLACKPIECES){
                                     lastRowMove = i;
                                     lastColumnMove = j;
-                                    levantamentPlaying(BLACKPIECES, lastRowMove, lastColumnMove);
-                                    //printf("CounterAux: %d\n", counterAux);
+                                    levantamentPlaying(player, lastRowMove, lastColumnMove);
                                     if(counterAux > 0 ){
                                         lastRowMove = i;
                                         lastColumnMove = j;
@@ -509,7 +507,7 @@ void verifyPiecesForPlay(int player){
                                 if(board[i][j] == BLACKPIECES){
                                     lastRowMove = i;
                                     lastColumnMove = j;
-                                    levantamentPlaying(BLACKPIECES, lastRowMove, lastColumnMove);
+                                    levantamentPlaying(player, lastRowMove, lastColumnMove);
                                     if(counterAux > 0 ){
                                         for(int w = 0;w<counterAux;w++){
                                             if(validatePlay[w].critical == 1){
@@ -531,7 +529,7 @@ void verifyPiecesForPlay(int player){
                                 if(board[i][j] == BLACKPIECES){
                                     lastRowMove = i;
                                     lastColumnMove = j;
-                                    levantamentPlaying(BLACKPIECES, lastRowMove, lastColumnMove);
+                                    levantamentPlaying(player, lastRowMove, lastColumnMove);
                                     if(counterAux > 0 ){
                                         lastRowMove = i;
                                         lastColumnMove = j;
@@ -557,7 +555,7 @@ void verifyPiecesForPlay(int player){
                                 if(board[i][j] == BLACKPIECES){
                                     lastRowMove = i;
                                     lastColumnMove = j;
-                                    levantamentPlaying(BLACKPIECES, lastRowMove, lastColumnMove);
+                                    levantamentPlaying(player, lastRowMove, lastColumnMove);
                                     if(counterAux > 0 ){
                                         for(int w = 0;w<counterAux;w++){
                                             if(validatePlay[w].critical == 1){
@@ -579,7 +577,7 @@ void verifyPiecesForPlay(int player){
                                 if(board[i][j] == BLACKPIECES){
                                     lastRowMove = i;
                                     lastColumnMove = j;
-                                    levantamentPlaying(BLACKPIECES, lastRowMove, lastColumnMove);
+                                    levantamentPlaying(player, lastRowMove, lastColumnMove);
                                     if(counterAux > 0 ){
                                         lastRowMove = i;
                                         lastColumnMove = j;
@@ -600,7 +598,7 @@ void verifyPiecesForPlay(int player){
                                 if(board[i][j] == BLACKPIECES){
                                     lastRowMove = i;
                                     lastColumnMove = j;
-                                    levantamentPlaying(BLACKPIECES, lastRowMove, lastColumnMove);
+                                    levantamentPlaying(player, lastRowMove, lastColumnMove);
                                     if(counterAux > 0 ){
                                         for(int w = 0;w<counterAux;w++){
                                             if(validatePlay[w].critical == 1){
@@ -622,7 +620,7 @@ void verifyPiecesForPlay(int player){
                                 if(board[i][j] == BLACKPIECES){
                                     lastRowMove = i;
                                     lastColumnMove = j;
-                                    levantamentPlaying(BLACKPIECES, lastRowMove, lastColumnMove);
+                                    levantamentPlaying(player, lastRowMove, lastColumnMove);
                                     if(counterAux > 0 ){
                                         lastRowMove = i;
                                         lastColumnMove = j;
@@ -673,7 +671,6 @@ int playingMachine(int playerMachine){
         
         movePieceOneMoviment();
         printf("\n");
-        showBoard(board);
         printf("\n");
         if(validate == 0 && playerMachine == WHITEPIECES){
             playerTurn = BLACKPIECES;
@@ -756,9 +753,15 @@ int playingPlayer(int playerOne){
                 levantamentPlaying(playerOne, lastRowMove, lastColumnMove);
                 valuePieces = piecesTeamWhite;
                 int flagDo = 0;
+                int printBoard = 0;
                 if(counterAux > 0){
+                    
                     for(int i = 0; i<counterAux;i++){
                         if(validatePlay[i].critical == 1){
+                            if(printBoard == 0){
+                                showBoard(board);
+                                printBoard = 1;
+                            }
                             flagDo++;
                             printf("\nOpcao: %d", i+1);
                             printf("\nLinha: %d\nColuna: %d\n", validatePlay[i].row+1, validatePlay[i].column+1);
@@ -801,7 +804,6 @@ int playingPlayer(int playerOne){
                 }
             }
         }
-        showBoard(board);
     }while(valuePieces != piecesTeamWhite);
         
     counterGet = 0;

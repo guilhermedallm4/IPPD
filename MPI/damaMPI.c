@@ -879,10 +879,9 @@ int startGame(int playerOne, int playerMachine){
             do {
                 verify = playingMachine(playerMachine);
             } while (verify == 2);
-            printf("\nQuantidade de pecas capturadas pelas Pretas %d\n", piecesTeamBlack);
             sendData(processRank);
         }
-
+        MPI_Barrier(MPI_COMM_WORLD);
         if(processRank == 0){
            recvData(processRank);
            showBoard(board);
@@ -894,6 +893,7 @@ int startGame(int playerOne, int playerMachine){
         //exit(0);
         countTurn++;
     }
+    return 0;
 }
 
 int main(){
